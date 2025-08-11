@@ -2,12 +2,14 @@
 
 return [
     'CommerceCursusDemo' => [
-        'description' => 'Cursus for Commerce Demo Plugin that runs on the OnAgendaBeforeRemove and the OnAgendaSave event to add and remove Commerce products when an Agenda event is created or deleted.',
+        'description' => 'Cursus for Commerce that adds and removes Commerce products when an Agenda event is created or deleted. It also sends a mail, when the Cursus event participant is booked or restored from expired.',
         'file' =>  'commercecursusdemo.plugin.php',
         'disabled' => true,
         'events' => [
             'OnAgendaBeforeRemove',
-            'OnAgendaSave'
+            'OnAgendaSave',
+            'OnCursusEventParticipantBooked',
+            'OnCursusEventParticipantRestored',
         ],
     ]
 ];
