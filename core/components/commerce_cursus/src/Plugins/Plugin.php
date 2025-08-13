@@ -8,8 +8,8 @@
 
 namespace modmore\Commerce_Cursus\Plugins;
 
+use modmore\Commerce_Cursus\Commerce_Cursus;
 use modX;
-use Commerce_Cursus;
 
 /**
  * Class Plugin

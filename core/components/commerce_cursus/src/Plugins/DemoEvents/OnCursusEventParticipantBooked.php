@@ -37,7 +37,7 @@ class OnCursusEventParticipantBooked extends Plugin
         if ($eventParticipant) {
             /** @var CursusParticipants $participant */
             $participant = $eventParticipant->getOne('Participant');
-            if (!$participant)  {
+            if (!$participant) {
                 $this->modx->log(xPDO::LOG_LEVEL_ERROR, 'Participant not found!', '', 'OnCursusEventParticipantBooked');
                 return;
             }
@@ -49,7 +49,7 @@ class OnCursusEventParticipantBooked extends Plugin
             $eventClass = new CursusEvents($this->modx);
             $c = $this->modx->newQuery('CursusEvents');
             $c = $eventClass->eventsQuery($c, [
-                'agenda_event_id' => $eventParticipant->get('event_id'),
+                'event_id' => $eventParticipant->get('event_id'),
                 'all' => true,
             ]);
             /** @var CursusEvents $event */
@@ -62,6 +62,8 @@ class OnCursusEventParticipantBooked extends Plugin
                     'userText' => 'tplCommerceCursusBookedMailText',
                     'sendParticipantMail' => true,
                 ]);
+            } else {
+                $this->modx->log(xPDO::LOG_LEVEL_ERROR, 'Event not found!', '', 'OnCursusEventParticipantBooked');
             }
         } else {
             $this->modx->log(xPDO::LOG_LEVEL_ERROR, 'EventParticipant not found!', '', 'OnCursusEventParticipantBooked');
