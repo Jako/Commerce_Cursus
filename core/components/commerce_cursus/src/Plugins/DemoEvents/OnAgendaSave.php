@@ -68,7 +68,9 @@ class OnAgendaSave extends Plugin
                 }
             }
 
-            $this->modx->cacheManager->refresh(['resource']);
+            $this->modx->cacheManager->refresh([
+                'resource' => []
+            ]);
         }
     }
 }
