@@ -2,11 +2,10 @@
 /**
  * Resolve load modules
  *
- * @package agenda
+ * @package commerce_cursus
  * @subpackage build
  *
  * @var array $options
- * @var xPDOObject $object
  * @var xPDOTransport $transport
  */
 

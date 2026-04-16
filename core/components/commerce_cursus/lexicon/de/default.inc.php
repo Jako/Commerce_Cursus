@@ -2,7 +2,7 @@
 /**
  * Default Lexicon Entries for Cursus for Commerce
  *
- * @package commerc_cursus
+ * @package commerce_cursus
  * @subpackage lexicon
  */
 $_lang['commerce_cursus'] = 'Cursus';

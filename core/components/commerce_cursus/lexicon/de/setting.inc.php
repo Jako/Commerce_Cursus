@@ -2,7 +2,7 @@
 /**
  * Settings Lexicon Entries for Cursus for Commerce
  *
- * @package commerc_cursus
+ * @package commerce_cursus
  * @subpackage lexicon
  */
 $_lang['setting_commerce_cursus.set_email_from_order'] = 'E-Mail anhand der Bestellung setzen';

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package ferienprogramm
+ * @package commerce_cursus
  * @subpackage plugin
  */
 
