@@ -115,7 +115,6 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
         } else {
             $modx->log(xPDO::LOG_LEVEL_ERROR, 'Your server or MODX installation does not meet the minimum requirements for this extra. Installation cannot continue.');
         }
-
         break;
     case xPDOTransport::ACTION_UNINSTALL:
         $success = true;
