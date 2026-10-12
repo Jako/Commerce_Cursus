@@ -2,6 +2,8 @@ const fs = require('fs');
 
 // Read package information dynamically from package.json
 const packageJson = require('./package.json');
+const path = require('path');
+const runner = require('child_process');
 const version = packageJson.version;
 const phpversion = packageJson.phpversion;
 const modxversion = packageJson.modxversion;
@@ -75,11 +77,11 @@ async function taskBump() {
         replace: '"php": ">=' + phpversion + '"'
     }], 'requirements in');
     replaceInFile('_build/build.transport.php', [{
-        search: /PKG_VERSION = '\d+\.\d+\.\d+-?[0-9a-z]*'/ig,
-        replace: `PKG_VERSION = '${versionNumber}'`
+        search: /'PKG_VERSION', '\d+\.\d+\.\d+-?[0-9a-z]*'/ig,
+        replace: `'PKG_VERSION', '${versionNumber}'`
     }, {
-        search: /PKG_RELEASE = '.*?'/ig,
-        replace: `PKG_RELEASE = '${versionRelease}'`
+        search: /'PKG_RELEASE', '.*?'/ig,
+        replace: `'PKG_RELEASE', '${versionRelease}'`
     }], 'version in');
     replaceInFile('_build/build.transport.php', [{
         search: /'php' => '>=\d+(\.\d+){1,2}'/ig,
@@ -89,7 +91,7 @@ async function taskBump() {
         replace: `'modx' => '>=${modxversion}'`
     }], 'requirements in');
     const buildFiles = [
-        '_build/config.json',
+        '_build/version.json',
         'core/components/commerce_cursus/composer.json',
     ];
     buildFiles.forEach(file => {
@@ -100,12 +102,26 @@ async function taskBump() {
     });
 }
 
+async function taskTransport() {
+    console.log('Creating transport package...');
+    const phpScriptPath = path.resolve(__dirname, '_build/build.transport.php');
+    runner.exec('php ' + phpScriptPath, function (err, phpResponse, stderr) {
+        if (err) {
+            console.log(err);
+        }
+        console.log(phpResponse);
+    });
+}
+
 const action = process.argv[2];
 if (action === 'bump') {
     taskBump();
+} else if (action === 'transport') {
+    taskTransport();
 } else {
     // Default: Beides ausführen
-    taskBump();
+    taskBump()
+        .then(() => taskTransport());
 }
 
 console.log('Done!');
