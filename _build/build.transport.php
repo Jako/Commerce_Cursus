@@ -10,31 +10,26 @@ function getSnippetContent($filename = '')
     $o = file_get_contents($filename);
     $o = str_replace('<?php', '', $o);
     $o = str_replace('?>', '', $o);
-    $o = trim($o);
-    return $o;
+    return trim($o);
 }
 
-$mtime = microtime();
-$mtime = explode(" ", $mtime);
-$mtime = $mtime[1] + $mtime[0];
-$tstart = $mtime;
+$tstart = microtime(true);
 set_time_limit(0);
 
 if (!defined('MOREPROVIDER_BUILD')) {
     /* define version */
     define('PKG_NAME', 'Commerce_Cursus');
     define('PKG_NAMESPACE', 'commerce_cursus');
-    define('PKG_VERSION', '1.2.2');
-    define('PKG_RELEASE', 'pl');
+    define('PKG_VERSION', '1.2.1');
+    define('PKG_RELEASE', 'pl2');
 
     /* load modx */
-    $test = dirname(__DIR__) . '/config.core.php';
     require_once dirname(__DIR__) . '/config.core.php';
     require_once MODX_CORE_PATH . 'model/modx/modx.class.php';
     $modx = new modX();
     $modx->initialize('mgr');
-    $modx->setLogLevel(modX::LOG_LEVEL_INFO);
-    $modx->setLogTarget('ECHO');
+    $modx->setLogLevel(xPDO::LOG_LEVEL_INFO);
+    $modx->setLogTarget();
     $targetDirectory = dirname(__DIR__) . '/_packages/';
 } else {
     $targetDirectory = MOREPROVIDER_BUILD_TARGET;
@@ -56,7 +51,6 @@ $sources = [
     'docs' => $root . 'core/components/' . PKG_NAMESPACE . '/docs/',
     'model' => $root . 'core/components/' . PKG_NAMESPACE . '/model/',
 ];
-unset($root);
 
 $modx->loadClass('transport.modPackageBuilder', '', false, true);
 $builder = new modPackageBuilder($modx);
@@ -64,7 +58,8 @@ $builder->directory = $targetDirectory;
 $builder->createPackage(PKG_NAMESPACE, PKG_VERSION, PKG_RELEASE);
 $builder->registerNamespace(PKG_NAMESPACE, false, true, '{core_path}components/' . PKG_NAMESPACE . '/', '{assets_path}components/' . PKG_NAMESPACE . '/');
 
-$modx->log(modX::LOG_LEVEL_INFO, 'Packaged in namespace.'); flush();
+$modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in namespace.');
+flush();
 
 $builder->package->put(
     [
@@ -80,19 +75,20 @@ $builder->package->put(
                 'source' => $sources['validators'] . 'requirements.script.php'
             ]
         ],
-        'resolve' => array(
-            array(
+        'resolve' => [
+            [
                 'type' => 'php',
                 'source' => $sources['resolvers'] . 'loadmodules.resolver.php',
-            ),
-            array(
+            ],
+            [
                 'type' => 'php',
                 'source' => $sources['resolvers'] . 'events.resolver.php',
-            )
-        )
+            ]
+        ]
     ]
 );
-$modx->log(modX::LOG_LEVEL_INFO, 'Packaged in core, requirements validator, and module loading resolver.'); flush();
+$modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in core, requirements validator, and module loading resolver.');
+flush();
 
 /**
  * Settings
@@ -108,7 +104,8 @@ if (is_array($settings)) {
         $vehicle = $builder->createVehicle($setting, $attributes);
         $builder->putVehicle($vehicle);
     }
-    $modx->log(modX::LOG_LEVEL_INFO, 'Packaged in ' . count($settings) . ' system settings.'); flush();
+    $modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in ' . count($settings) . ' system settings.');
+    flush();
     unset($settings, $setting, $attributes);
 }
 
@@ -117,7 +114,8 @@ if (is_array($settings)) {
  */
 $category = $modx->newObject('modCategory');
 $category->set('category', 'Cursus for Commerce');
-$modx->log(modX::LOG_LEVEL_INFO, 'Created category.'); flush();
+$modx->log(xPDO::LOG_LEVEL_INFO, 'Created category.');
+flush();
 
 /**
  * Snippets
@@ -125,7 +123,8 @@ $modx->log(modX::LOG_LEVEL_INFO, 'Created category.'); flush();
 $snippets = include $sources['data'] . 'transport.snippets.php';
 if (is_array($snippets)) {
     $category->addMany($snippets);
-    $modx->log(modX::LOG_LEVEL_INFO, 'Packaged in ' . count($snippets) . ' snippets.'); flush();
+    $modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in ' . count($snippets) . ' snippets.');
+    flush();
 }
 unset($snippets);
 
@@ -135,7 +134,8 @@ unset($snippets);
 $plugins = include $sources['data'] . 'transport.plugins.php';
 if (is_array($plugins)) {
     $category->addMany($plugins, 'Plugins');
-    $modx->log(modX::LOG_LEVEL_INFO, 'Packaged in ' . count($plugins) . ' plugins.'); flush();
+    $modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in ' . count($plugins) . ' plugins.');
+    flush();
 }
 unset($plugins);
 
@@ -168,25 +168,31 @@ $attr = [
 
 $vehicle = $builder->createVehicle($category, $attr);
 $builder->putVehicle($vehicle);
-$modx->log(modX::LOG_LEVEL_INFO, 'Packaged in category.'); flush();
+$modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in category.');
+flush();
 
 /* now pack in the license file, readme and setup options */
 $builder->setPackageAttributes([
     'license' => file_get_contents($sources['docs'] . 'license.txt'),
     'readme' => file_get_contents($sources['docs'] . 'readme.txt'),
     'changelog' => file_get_contents($sources['docs'] . 'changelog.txt'),
+    'requires' => [
+        'php' => '>=7.4',
+        'modx' => '>=2.8',
+    ]
 ]);
-$modx->log(modX::LOG_LEVEL_INFO, 'Packaged in package attributes.'); flush();
+$modx->log(xPDO::LOG_LEVEL_INFO, 'Packaged in package attributes.');
+flush();
 
-$modx->log(modX::LOG_LEVEL_INFO, 'Zipping up the package...'); flush();
+$modx->log(xPDO::LOG_LEVEL_INFO, 'Packing...');
+flush();
 $builder->pack();
+$modx->cacheManager->deleteTree($root . '_packages/' . $builder->getSignature(), [
+    'deleteTop' => true,
+    'extensions' => []
+]);
 
-$mtime = microtime();
-$mtime = explode(" ", $mtime);
-$mtime = $mtime[1] + $mtime[0];
-$tend = $mtime;
-$totalTime = ($tend - $tstart);
-$totalTime = sprintf("%2.4f s", $totalTime);
+$totalTime = microtime(true) - $tstart;
+$totalTime = sprintf("%2.6f s", $totalTime);
 
-$modx->log(modX::LOG_LEVEL_INFO, "\nPackage Built.\nExecution time: {$totalTime}\n");
-
+$modx->log(xPDO::LOG_LEVEL_INFO, "\nPackage Built.\nExecution time: $totalTime\n");
